@@ -1,0 +1,112 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook } from '@testing-library/react';
+import { useChats } from './useChats';
+import { useChatStore } from '../store/chatStore';
+
+vi.mock('../store/chatStore');
+
+describe('useChats', () => {
+  const mockFetchChats = vi.fn();
+  const mockSelectChat = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    vi.mocked(useChatStore).mockReturnValue({
+      chats: [],
+      selectedChatId: null,
+      isLoading: false,
+      error: null,
+      fetchChats: mockFetchChats,
+      selectChat: mockSelectChat
+    } as unknown as ReturnType<typeof useChatStore>);
+  });
+
+  it('should fetch chats on mount when chats are empty', () => {
+    renderHook(() => useChats());
+
+    expect(mockFetchChats).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not fetch chats if already loading', () => {
+    vi.mocked(useChatStore).mockReturnValue({
+      chats: [],
+      selectedChatId: null,
+      isLoading: true,
+      error: null,
+      fetchChats: mockFetchChats,
+      selectChat: mockSelectChat
+    } as unknown as ReturnType<typeof useChatStore>);
+
+    renderHook(() => useChats());
+
+    expect(mockFetchChats).not.toHaveBeenCalled();
+  });
+
+  it('should not fetch chats if chats already exist', () => {
+    vi.mocked(useChatStore).mockReturnValue({
+      chats: [{ id: 'chat-1', name: 'Test', avatar: '', lastMessage: null, unreadCount: 0 }],
+      selectedChatId: null,
+      isLoading: false,
+      error: null,
+      fetchChats: mockFetchChats,
+      selectChat: mockSelectChat
+    } as unknown as ReturnType<typeof useChatStore>);
+
+    renderHook(() => useChats());
+
+    expect(mockFetchChats).not.toHaveBeenCalled();
+  });
+
+  it('should return chats and selectedChat', () => {
+    const mockChats = [
+      { id: 'chat-1', name: 'Test', avatar: '', lastMessage: null, unreadCount: 0 }
+    ];
+
+    vi.mocked(useChatStore).mockReturnValue({
+      chats: mockChats,
+      selectedChatId: 'chat-1',
+      isLoading: false,
+      error: null,
+      fetchChats: mockFetchChats,
+      selectChat: mockSelectChat
+    } as unknown as ReturnType<typeof useChatStore>);
+
+    const { result } = renderHook(() => useChats());
+
+    expect(result.current.chats).toEqual(mockChats);
+    expect(result.current.selectedChat).toEqual(mockChats[0]);
+    expect(result.current.selectedChatId).toBe('chat-1');
+  });
+
+  it('should return null for selectedChat when no chat is selected', () => {
+    vi.mocked(useChatStore).mockReturnValue({
+      chats: [{ id: 'chat-1', name: 'Test', avatar: '', lastMessage: null, unreadCount: 0 }],
+      selectedChatId: null,
+      isLoading: false,
+      error: null,
+      fetchChats: mockFetchChats,
+      selectChat: mockSelectChat
+    } as unknown as ReturnType<typeof useChatStore>);
+
+    const { result } = renderHook(() => useChats());
+
+    expect(result.current.selectedChat).toBeNull();
+  });
+
+  it('should expose selectChat function', () => {
+    const { result } = renderHook(() => useChats());
+
+    result.current.selectChat('chat-2');
+
+    expect(mockSelectChat).toHaveBeenCalledWith('chat-2');
+  });
+
+  it('should expose refetch function', () => {
+    const { result } = renderHook(() => useChats());
+
+    result.current.refetch();
+
+    expect(mockFetchChats).toHaveBeenCalled();
+  });
+});
