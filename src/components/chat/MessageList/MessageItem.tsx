@@ -13,18 +13,20 @@ function MessageStatus({ status }: { status: Message['status'] }) {
     sending: '○',
     sent: '✓',
     delivered: '✓✓',
-    read: '✓✓'
+    read: '✓✓',
+    failed: '✗'
   };
 
   const statusColors = {
     sending: 'text-gray-400',
     sent: 'text-gray-400',
     delivered: 'text-gray-400',
-    read: 'text-blue-500'
+    read: 'text-blue-500',
+    failed: 'text-red-500'
   };
 
   return (
-    <span className={`text-xs ${statusColors[status]}`}>
+    <span className={`text-xs ${statusColors[status]}`} title={status === 'failed' ? 'Failed to send' : ''}>
       {statusIcons[status]}
     </span>
   );

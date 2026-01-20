@@ -94,6 +94,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       })
       .catch((error) => {
         console.error('Failed to send message:', error);
+        get().updateMessageStatus(chatId, optimisticId, 'failed');
       });
   },
 

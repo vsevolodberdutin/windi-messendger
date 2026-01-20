@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import { useChatStore } from './store';
-import { mockWebSocket } from './api';
-import { useMessageStore } from './store';
+import { useWebSocket } from './hooks';
 import { ChatList, MessageList, MessageInput } from './components/chat';
 
 function App() {
   const fetchChats = useChatStore((state) => state.fetchChats);
-  const { addMessage } = useMessageStore();
+  const { connect, disconnect } = useWebSocket();
   const selectedChat = useChatStore((state) =>
     state.chats.find((chat) => chat.id === state.selectedChatId)
   );
@@ -16,16 +15,11 @@ function App() {
   }, [fetchChats]);
 
   useEffect(() => {
-    mockWebSocket.connect();
-    const unsubscribe = mockWebSocket.onMessage((message) => {
-      addMessage(message);
-    });
-
+    connect();
     return () => {
-      unsubscribe();
-      mockWebSocket.disconnect();
+      disconnect();
     };
-  }, [addMessage]);
+  }, [connect, disconnect]);
 
   return (
     <div className="flex h-screen bg-white">

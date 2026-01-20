@@ -27,7 +27,7 @@ function RowComponent({
 
 export function MessageList() {
   const { selectedChatId } = useChatStore();
-  const { messages, isLoading, fetchMessages } = useMessageStore();
+  const { messages, isLoading, error, fetchMessages } = useMessageStore();
   const listRef = useRef<ListImperativeAPI>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -107,6 +107,23 @@ export function MessageList() {
         <div className="flex flex-col items-center gap-2">
           <Spinner size="lg" />
           <p className="text-gray-500">Loading messages...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full bg-gray-50">
+        <div className="flex flex-col items-center gap-3 p-4">
+          <p className="text-red-500 text-center">{error}</p>
+          <Button
+            onClick={() => selectedChatId && fetchMessages(selectedChatId)}
+            variant="primary"
+            size="sm"
+          >
+            Retry
+          </Button>
         </div>
       </div>
     );
