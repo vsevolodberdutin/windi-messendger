@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Chat, Message } from '../types';
 import { getChats } from '../api/chatService';
+import { CURRENT_USER } from '../types/user';
 
 interface ChatState {
   chats: Chat[];
@@ -26,7 +27,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     try {
       const chats = await getChats();
-      set({ chats, isLoading: false });
+      const sortedChats = chats.map((chat) => ({
+        ...chat,
+        lastCurrentUserMessageTimestamp:
+          chat.lastMessage?.senderId === CURRENT_USER.id
+            ? chat.lastMessage.timestamp
+            : (chat.lastCurrentUserMessageTimestamp ?? 0)
+      })).sort((a, b) => {
+        const aTimestamp = a.lastCurrentUserMessageTimestamp ?? 0;
+        const bTimestamp = b.lastCurrentUserMessageTimestamp ?? 0;
+        return bTimestamp - aTimestamp;
+      });
+      set({ chats: sortedChats, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to fetch chats',
@@ -42,13 +54,24 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   updateLastMessage: (chatId: string, message: Message) => {
     set((state) => ({
+      // Current complexity: O(n log n) - map O(n) + sort O(n log n)
+      // For 1000+ chats, consider optimization: remove chat O(n) + binary search O(log n) + insert O(n) = O(n)
       chats: state.chats.map((chat) =>
         chat.id === chatId
-          ? { ...chat, lastMessage: message }
+          ? {
+              ...chat,
+              lastMessage: message,
+              lastCurrentUserMessageTimestamp:
+                message.senderId === CURRENT_USER.id
+                  ? message.timestamp
+                  : chat.lastCurrentUserMessageTimestamp
+            }
           : chat
-      ).sort(
-        (a, b) => (b.lastMessage?.timestamp ?? 0) - (a.lastMessage?.timestamp ?? 0)
-      )
+      ).sort((a, b) => {
+        const aTimestamp = a.lastCurrentUserMessageTimestamp ?? 0;
+        const bTimestamp = b.lastCurrentUserMessageTimestamp ?? 0;
+        return bTimestamp - aTimestamp;
+      })
     }));
   },
 

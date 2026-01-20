@@ -116,33 +116,6 @@ export function generateMockMessages(
   return messages;
 }
 
-export function generateMockChats(users: User[]): Chat[] {
-  return users.map((user) => {
-    const lastMessageTime = Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000;
-    const isCurrentUserMessage = Math.random() > 0.5;
-
-    const lastMessage: Message = {
-      id: nanoid(),
-      chatId: user.id,
-      text: getRandomElement(SAMPLE_MESSAGES),
-      senderId: isCurrentUserMessage ? CURRENT_USER.id : user.id,
-      timestamp: lastMessageTime,
-      status: 'read'
-    };
-
-    return {
-      id: user.id,
-      name: user.name,
-      avatar: user.avatar,
-      lastMessage,
-      unreadCount: Math.floor(Math.random() * 5)
-    };
-  });
-}
-
-export const MOCK_USERS = generateMockUsers(15);
-export const MOCK_CHATS = generateMockChats(MOCK_USERS);
-
 const messagesCache: Record<string, Message[]> = {};
 
 export function getMockMessagesForChat(chatId: string): Message[] {
@@ -152,3 +125,35 @@ export function getMockMessagesForChat(chatId: string): Message[] {
   }
   return messagesCache[chatId];
 }
+
+export function generateMockChats(users: User[]): Chat[] {
+  return users.map((user) => {
+    // Use the cached messages to ensure consistency with actual message history
+    const messages = getMockMessagesForChat(user.id);
+    const actualLastMessage = messages[messages.length - 1];
+
+    // Find the last message from current user for sorting
+    let lastCurrentUserMessageTimestamp = 0;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].senderId === CURRENT_USER.id) {
+        lastCurrentUserMessageTimestamp = messages[i].timestamp;
+        break;
+      }
+    }
+
+    return {
+      id: user.id,
+      name: user.name,
+      avatar: user.avatar,
+      lastMessage: actualLastMessage,
+      unreadCount: Math.floor(Math.random() * 5),
+      lastCurrentUserMessageTimestamp
+    };
+  });
+}
+
+export const MOCK_USERS = generateMockUsers(15);
+export const MOCK_CHATS = generateMockChats(MOCK_USERS).map(chat => ({
+  ...chat,
+  unreadCount: 0
+}));

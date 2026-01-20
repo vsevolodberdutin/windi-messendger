@@ -61,17 +61,21 @@ export function MessageList() {
   useEffect(() => {
     if (selectedChatId) {
       fetchMessages(selectedChatId);
+      setShowScrollButton(false);
     }
   }, [selectedChatId, fetchMessages]);
 
   useEffect(() => {
-    if (chatMessages.length > 0 && listRef.current && !showScrollButton) {
-      listRef.current.scrollToRow({
-        index: chatMessages.length - 1,
-        align: 'end'
-      });
+    if (chatMessages.length > 0 && listRef.current && dimensions.height > 0) {
+      // Use setTimeout to ensure the list is fully rendered
+      setTimeout(() => {
+        listRef.current?.scrollToRow({
+          index: chatMessages.length - 1,
+          align: 'end'
+        });
+      }, 0);
     }
-  }, [chatMessages.length, showScrollButton]);
+  }, [chatMessages.length, dimensions.height, selectedChatId]);
 
   const handleScroll = useCallback(
     (event: React.UIEvent<HTMLDivElement>) => {

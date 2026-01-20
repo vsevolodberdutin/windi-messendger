@@ -43,6 +43,13 @@ export const useMessageStore = create<MessageState>((set, get) => ({
         isLoading: { ...state.isLoading, [chatId]: false },
         loadedChats: { ...state.loadedChats, [chatId]: true }
       }));
+
+      // Update chat's last message with the actual last message from MessageList
+      if (fetchedMessages.length > 0) {
+        const actualLastMessage = fetchedMessages[fetchedMessages.length - 1];
+        const chatStore = useChatStore.getState();
+        chatStore.updateLastMessage(chatId, actualLastMessage);
+      }
     } catch (error) {
       set((state) => ({
         error: error instanceof Error ? error.message : 'Failed to fetch messages',

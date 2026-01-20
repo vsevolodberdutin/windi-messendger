@@ -6,4 +6,5 @@ export interface Chat {
   avatar: string;
   lastMessage: Message | null;
   unreadCount: number;
+  lastCurrentUserMessageTimestamp?: number;
 }
