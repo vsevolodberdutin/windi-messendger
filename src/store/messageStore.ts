@@ -8,6 +8,7 @@ import { useChatStore } from './chatStore';
 interface MessageState {
   messages: Record<string, Message[]>;
   isLoading: Record<string, boolean>;
+  loadedChats: Record<string, boolean>;
   error: string | null;
 
   fetchMessages: (chatId: string) => Promise<void>;
@@ -20,12 +21,13 @@ interface MessageState {
 export const useMessageStore = create<MessageState>((set, get) => ({
   messages: {},
   isLoading: {},
+  loadedChats: {},
   error: null,
 
   fetchMessages: async (chatId: string) => {
-    const { messages, isLoading } = get();
+    const { loadedChats, isLoading } = get();
 
-    if (messages[chatId] || isLoading[chatId]) {
+    if (loadedChats[chatId] || isLoading[chatId]) {
       return;
     }
 
@@ -38,7 +40,8 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       const fetchedMessages = await getMessages(chatId);
       set((state) => ({
         messages: { ...state.messages, [chatId]: fetchedMessages },
-        isLoading: { ...state.isLoading, [chatId]: false }
+        isLoading: { ...state.isLoading, [chatId]: false },
+        loadedChats: { ...state.loadedChats, [chatId]: true }
       }));
     } catch (error) {
       set((state) => ({
@@ -117,8 +120,10 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   clearMessages: (chatId: string) => {
     set((state) => {
       const newMessages = { ...state.messages };
+      const newLoadedChats = { ...state.loadedChats };
       delete newMessages[chatId];
-      return { messages: newMessages };
+      delete newLoadedChats[chatId];
+      return { messages: newMessages, loadedChats: newLoadedChats };
     });
   }
 }));

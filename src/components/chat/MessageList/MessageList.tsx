@@ -29,37 +29,40 @@ export function MessageList() {
   const { selectedChatId } = useChatStore();
   const { messages, isLoading, error, fetchMessages } = useMessageStore();
   const listRef = useRef<ListImperativeAPI>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const lastScrollTop = useRef(0);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   const chatMessages = selectedChatId ? messages[selectedChatId] ?? [] : [];
   const isChatLoading = selectedChatId ? isLoading[selectedChatId] : false;
+
+  const containerCallbackRef = useCallback((node: HTMLDivElement | null) => {
+    if (resizeObserverRef.current) {
+      resizeObserverRef.current.disconnect();
+      resizeObserverRef.current = null;
+    }
+
+    if (node) {
+      resizeObserverRef.current = new ResizeObserver((entries) => {
+        const entry = entries[0];
+        if (entry) {
+          setDimensions({
+            width: entry.contentRect.width,
+            height: entry.contentRect.height
+          });
+        }
+      });
+
+      resizeObserverRef.current.observe(node);
+    }
+  }, []);
 
   useEffect(() => {
     if (selectedChatId) {
       fetchMessages(selectedChatId);
     }
   }, [selectedChatId, fetchMessages]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (entry) {
-        setDimensions({
-          width: entry.contentRect.width,
-          height: entry.contentRect.height
-        });
-      }
-    });
-
-    resizeObserver.observe(container);
-    return () => resizeObserver.disconnect();
-  }, []);
 
   useEffect(() => {
     if (chatMessages.length > 0 && listRef.current && !showScrollButton) {
@@ -138,7 +141,7 @@ export function MessageList() {
   }
 
   return (
-    <div ref={containerRef} className="relative h-full bg-gray-50">
+    <div ref={containerCallbackRef} className="relative h-full bg-gray-50">
       {dimensions.height > 0 && (
         <List<RowProps>
           listRef={listRef}
