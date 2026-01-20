@@ -88,7 +88,7 @@ describe('MessageItem', () => {
     render(<MessageItem message={message} style={{}} />);
 
     const statusElement = screen.getByText('✓✓');
-    expect(statusElement).toHaveClass('text-blue-500');
+    expect(statusElement).toHaveClass('text-blue-200');
   });
 
   it('should not show status for other users messages', () => {

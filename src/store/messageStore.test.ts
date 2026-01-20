@@ -32,6 +32,7 @@ describe('messageStore', () => {
     useMessageStore.setState({
       messages: {},
       isLoading: {},
+      loadedChats: {},
       error: null
     });
     useChatStore.setState({

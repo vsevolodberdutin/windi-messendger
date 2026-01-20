@@ -52,7 +52,7 @@ export function MessageInput() {
         disabled={!text.trim()}
         className="shrink-0"
       >
-        Send
+        Отправить
       </Button>
     </form>
   );

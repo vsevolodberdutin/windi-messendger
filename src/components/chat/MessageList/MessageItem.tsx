@@ -18,11 +18,11 @@ function MessageStatus({ status }: { status: Message['status'] }) {
   };
 
   const statusColors = {
-    sending: 'text-gray-400',
-    sent: 'text-gray-400',
-    delivered: 'text-gray-400',
-    read: 'text-blue-500',
-    failed: 'text-red-500'
+    sending: 'text-gray-200',
+    sent: 'text-gray-200',
+    delivered: 'text-gray-200',
+    read: 'text-blue-200',
+    failed: 'text-red-300'
   };
 
   return (
@@ -48,7 +48,7 @@ export function MessageItem({ message, style }: MessageItemProps) {
             ? 'bg-blue-500 text-white rounded-br-sm'
             : 'bg-gray-100 text-gray-900 rounded-bl-sm'}`}
       >
-        <p className="whitespace-pre-wrap break-words text-sm">
+        <p className="whitespace-pre-wrap wrap-break-word text-sm">
           {message.text}
         </p>
         <div
