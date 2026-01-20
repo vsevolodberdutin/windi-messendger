@@ -34,7 +34,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center font-medium
+      className={`inline-flex items-center justify-center font-medium cursor-pointer
         rounded-lg
         transition-colors duration-200
         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2

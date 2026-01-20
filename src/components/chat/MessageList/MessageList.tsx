@@ -157,16 +157,20 @@ export function MessageList() {
       )}
 
       {showScrollButton && (
-        <div className="absolute bottom-4 right-4">
-          <Button
-            onClick={scrollToBottom}
-            variant="primary"
-            size="sm"
-            className="rounded-full shadow-lg"
-          >
-            ↓ New messages
-          </Button>
-        </div>
+        <button
+          onClick={scrollToBottom}
+          className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-3 cursor-pointer
+            rounded-full bg-white border border-gray-200
+            shadow-lg shadow-gray-400/40
+            transition-all duration-300
+            hover:shadow-xl hover:shadow-gray-400/50
+            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+            active:scale-95"
+          aria-label="Scroll to new messages"
+        >
+          <span className="text-lg text-gray-700">↓</span>
+          <span className="text-sm font-medium text-gray-800">New messages</span>
+        </button>
       )}
     </div>
   );
