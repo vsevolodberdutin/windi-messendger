@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useChatStore } from './store';
+import { useChatStore, useUIStore } from './store';
 import { useWebSocket } from './hooks';
 import { ChatList, MessageList, MessageInput } from './components/chat';
 
@@ -9,6 +9,8 @@ function App() {
   const selectedChat = useChatStore((state) =>
     state.chats.find((chat) => chat.id === state.selectedChatId)
   );
+  const isSidebarOpen = useUIStore((state) => state.isSidebarOpen);
+  const toggleSidebar = useUIStore((state) => state.toggleSidebar);
 
   useEffect(() => {
     fetchChats();
@@ -25,17 +27,54 @@ function App() {
     <div className="flex h-screen bg-white">
       {/* Sidebar - Chat List */}
       <aside
-        className="w-80 shrink-0 flex flex-col
-          border-r border-gray-200"
+        className={`shrink-0 flex flex-col
+          border-r border-gray-200
+          transition-all duration-300 ease-in-out
+          ${isSidebarOpen ? 'w-80' : 'w-16'}`}
       >
         <header
-          className="flex items-center h-16 px-4
+          className="flex items-center justify-between h-16 px-4
             border-b border-gray-200"
         >
-          <h1 className="text-xl font-bold text-gray-900">Windi Messenger</h1>
+          <h1 className={`text-xl font-bold text-gray-900
+            transition-opacity duration-200
+            ${isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'}`}>
+            Windi Messenger
+          </h1>
+          <button
+            onClick={toggleSidebar}
+            className="inline-flex items-center justify-center cursor-pointer shrink-0
+              rounded-lg p-2
+              transition-colors duration-200
+              hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+          >
+            <svg
+              className="w-5 h-5 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              {isSidebarOpen ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              )}
+            </svg>
+          </button>
         </header>
         <div className="flex-1 overflow-hidden">
-          <ChatList />
+          <ChatList isCollapsed={!isSidebarOpen} />
         </div>
       </aside>
 

@@ -2,7 +2,11 @@ import { useChatStore } from '../../../store';
 import { Spinner } from '../../ui';
 import { ChatListItem } from './ChatListItem';
 
-export function ChatList() {
+interface ChatListProps {
+  isCollapsed?: boolean;
+}
+
+export function ChatList({ isCollapsed = false }: ChatListProps) {
   const { chats, selectedChatId, isLoading, error, selectChat } = useChatStore();
 
   if (isLoading) {
@@ -36,6 +40,7 @@ export function ChatList() {
           key={chat.id}
           chat={chat}
           isSelected={selectedChatId === chat.id}
+          isCollapsed={isCollapsed}
           onClick={() => selectChat(chat.id)}
         />
       ))}

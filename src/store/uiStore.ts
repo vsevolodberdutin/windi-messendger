@@ -1,0 +1,15 @@
+import { create } from 'zustand';
+
+interface UIState {
+  isSidebarOpen: boolean;
+  toggleSidebar: () => void;
+  setSidebarOpen: (isOpen: boolean) => void;
+}
+
+export const useUIStore = create<UIState>((set) => ({
+  isSidebarOpen: typeof window !== 'undefined' ? window.innerWidth >= 768 : true,
+
+  toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
+
+  setSidebarOpen: (isOpen: boolean) => set({ isSidebarOpen: isOpen }),
+}));
