@@ -53,26 +53,46 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   updateLastMessage: (chatId: string, message: Message) => {
-    set((state) => ({
-      // Current complexity: O(n log n) - map O(n) + sort O(n log n)
-      // For 1000+ chats, consider optimization: remove chat O(n) + binary search O(log n) + insert O(n) = O(n)
-      chats: state.chats.map((chat) =>
-        chat.id === chatId
-          ? {
-              ...chat,
-              lastMessage: message,
-              lastCurrentUserMessageTimestamp:
-                message.senderId === CURRENT_USER.id
-                  ? message.timestamp
-                  : chat.lastCurrentUserMessageTimestamp
-            }
-          : chat
-      ).sort((a, b) => {
-        const aTimestamp = a.lastCurrentUserMessageTimestamp ?? 0;
-        const bTimestamp = b.lastCurrentUserMessageTimestamp ?? 0;
-        return bTimestamp - aTimestamp;
-      })
-    }));
+    set((state) => {
+      // Optimized complexity: O(n) - find O(n) + filter O(n) + findIndex O(n) = O(n)
+      // Much better than previous O(n log n) for frequent message updates
+
+      // Find the chat to update
+      const targetChat = state.chats.find((c) => c.id === chatId);
+      if (!targetChat) return state;
+
+      // Create updated chat with new message and timestamp
+      const updatedChat: Chat = {
+        ...targetChat,
+        lastMessage: message,
+        lastCurrentUserMessageTimestamp:
+          message.senderId === CURRENT_USER.id
+            ? message.timestamp
+            : targetChat.lastCurrentUserMessageTimestamp
+      };
+
+      const updatedTimestamp = updatedChat.lastCurrentUserMessageTimestamp ?? 0;
+
+      // Remove the target chat from the array
+      const otherChats = state.chats.filter((c) => c.id !== chatId);
+
+      // Find insertion position (first chat with lower timestamp)
+      const insertionIndex = otherChats.findIndex(
+        (chat) => (chat.lastCurrentUserMessageTimestamp ?? 0) < updatedTimestamp
+      );
+
+      // Insert at correct position
+      const newChats =
+        insertionIndex === -1
+          ? [...otherChats, updatedChat] // Add at end if no lower timestamp found
+          : [
+              ...otherChats.slice(0, insertionIndex),
+              updatedChat,
+              ...otherChats.slice(insertionIndex)
+            ];
+
+      return { chats: newChats };
+    });
   },
 
   incrementUnreadCount: (chatId: string) => {

@@ -49,13 +49,13 @@ describe('MessageItem', () => {
     expect(bubble).toHaveClass('bg-blue-500');
   });
 
-  it('should apply gray background for other messages', () => {
+  it('should apply white background for other messages', () => {
     const message = createMessage({ senderId: 'other-user' });
 
     render(<MessageItem message={message} style={{}} />);
 
     const bubble = screen.getByText('Test message').closest('div');
-    expect(bubble).toHaveClass('bg-gray-100');
+    expect(bubble).toHaveClass('bg-white');
   });
 
   it('should show sending status', () => {

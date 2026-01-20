@@ -111,16 +111,17 @@ describe('chatStore', () => {
       expect(chat?.lastMessage).toEqual(newMessage);
     });
 
-    it('should sort chats by last message timestamp', async () => {
+    it('should sort chats by last current user message timestamp', async () => {
       const { fetchChats, updateLastMessage } = useChatStore.getState();
 
       await fetchChats();
 
+      // Create a message from the CURRENT_USER to trigger sorting
       const newMessage: Message = {
         id: 'new-msg',
         chatId: 'chat-1',
         text: 'New message',
-        senderId: 'user-1',
+        senderId: 'current-user', // Changed to CURRENT_USER.id
         timestamp: Date.now() + 1000,
         status: 'sent'
       };
@@ -128,6 +129,7 @@ describe('chatStore', () => {
       updateLastMessage('chat-1', newMessage);
 
       const chats = useChatStore.getState().chats;
+      // chat-1 should now be first because it has the most recent message from CURRENT_USER
       expect(chats[0].id).toBe('chat-1');
     });
   });

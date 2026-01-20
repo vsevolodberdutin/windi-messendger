@@ -4,18 +4,22 @@ import type { Message, MessageStatus } from '../types';
 import { getMessages, sendMessage as apiSendMessage } from '../api/chatService';
 import { CURRENT_USER } from '../types/user';
 import { useChatStore } from './chatStore';
+import { MESSAGE_STATUS_DELAYS } from '../constants';
 
 interface MessageState {
   messages: Record<string, Message[]>;
   isLoading: Record<string, boolean>;
   loadedChats: Record<string, boolean>;
   error: string | null;
+  /** Stores timeout IDs for cleanup to prevent memory leaks */
+  pendingTimeouts: Record<string, NodeJS.Timeout[]>;
 
   fetchMessages: (chatId: string) => Promise<void>;
   addMessage: (message: Message) => void;
   sendMessage: (chatId: string, text: string) => void;
   updateMessageStatus: (chatId: string, messageId: string, status: MessageStatus) => void;
   clearMessages: (chatId: string) => void;
+  clearPendingTimeouts: (messageId: string) => void;
 }
 
 export const useMessageStore = create<MessageState>((set, get) => ({
@@ -23,6 +27,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   isLoading: {},
   loadedChats: {},
   error: null,
+  pendingTimeouts: {},
 
   fetchMessages: async (chatId: string) => {
     const { loadedChats, isLoading } = get();
@@ -94,17 +99,30 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       .then(() => {
         get().updateMessageStatus(chatId, optimisticId, 'sent');
 
-        setTimeout(() => {
+        // Store timeout IDs for cleanup
+        const deliveredTimeout = setTimeout(() => {
           get().updateMessageStatus(chatId, optimisticId, 'delivered');
-        }, 500 + Math.random() * 1000);
+        }, MESSAGE_STATUS_DELAYS.DELIVERED_MIN + Math.random() * MESSAGE_STATUS_DELAYS.DELIVERED_RANGE);
 
-        setTimeout(() => {
+        const readTimeout = setTimeout(() => {
           get().updateMessageStatus(chatId, optimisticId, 'read');
-        }, 1500 + Math.random() * 2000);
+          // Clean up timeouts after read status is set
+          get().clearPendingTimeouts(optimisticId);
+        }, MESSAGE_STATUS_DELAYS.READ_MIN + Math.random() * MESSAGE_STATUS_DELAYS.READ_RANGE);
+
+        // Store timeouts for potential cleanup
+        set((state) => ({
+          pendingTimeouts: {
+            ...state.pendingTimeouts,
+            [optimisticId]: [deliveredTimeout, readTimeout]
+          }
+        }));
       })
       .catch((error) => {
         console.error('Failed to send message:', error);
         get().updateMessageStatus(chatId, optimisticId, 'failed');
+        // Clean up timeouts on failure
+        get().clearPendingTimeouts(optimisticId);
       });
   },
 
@@ -128,9 +146,39 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     set((state) => {
       const newMessages = { ...state.messages };
       const newLoadedChats = { ...state.loadedChats };
+      const newPendingTimeouts = { ...state.pendingTimeouts };
+
+      // Clear all pending timeouts for messages in this chat
+      const chatMessages = state.messages[chatId] || [];
+      chatMessages.forEach((msg) => {
+        const timeouts = newPendingTimeouts[msg.id];
+        if (timeouts) {
+          timeouts.forEach(clearTimeout);
+          delete newPendingTimeouts[msg.id];
+        }
+      });
+
       delete newMessages[chatId];
       delete newLoadedChats[chatId];
-      return { messages: newMessages, loadedChats: newLoadedChats };
+
+      return {
+        messages: newMessages,
+        loadedChats: newLoadedChats,
+        pendingTimeouts: newPendingTimeouts
+      };
+    });
+  },
+
+  clearPendingTimeouts: (messageId: string) => {
+    set((state) => {
+      const timeouts = state.pendingTimeouts[messageId];
+      if (timeouts) {
+        timeouts.forEach(clearTimeout);
+        const newPendingTimeouts = { ...state.pendingTimeouts };
+        delete newPendingTimeouts[messageId];
+        return { pendingTimeouts: newPendingTimeouts };
+      }
+      return state;
     });
   }
 }));
