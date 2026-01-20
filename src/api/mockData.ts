@@ -80,7 +80,7 @@ function generateRandomUser(index: number): User {
   return {
     id,
     name: `${firstName} ${lastName}`,
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${id}`,
+    avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${id}`,
     isOnline: Math.random() > 0.5
   };
 }

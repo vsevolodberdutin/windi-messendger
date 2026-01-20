@@ -98,7 +98,7 @@ export function MessageList() {
 
   if (!selectedChatId) {
     return (
-      <div className="flex items-center justify-center h-full bg-gray-50">
+      <div className="flex items-center justify-center h-full ">
         <p className="text-gray-500">Select a chat to start messaging</p>
       </div>
     );
@@ -106,7 +106,7 @@ export function MessageList() {
 
   if (isChatLoading) {
     return (
-      <div className="flex items-center justify-center h-full bg-gray-50">
+      <div className="flex items-center justify-center h-full">
         <div className="flex flex-col items-center gap-2">
           <Spinner size="lg" />
           <p className="text-gray-500">Loading messages...</p>
@@ -117,7 +117,7 @@ export function MessageList() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full bg-gray-50">
+      <div className="flex items-center justify-center h-full">
         <div className="flex flex-col items-center gap-3 p-4">
           <p className="text-red-500 text-center">{error}</p>
           <Button
@@ -134,14 +134,14 @@ export function MessageList() {
 
   if (chatMessages.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full bg-gray-50">
+      <div className="flex items-center justify-center h-full">
         <p className="text-gray-500">No messages yet. Start the conversation!</p>
       </div>
     );
   }
 
   return (
-    <div ref={containerCallbackRef} className="relative h-full bg-gray-50">
+    <div ref={containerCallbackRef} className="relative h-full ">
       {dimensions.height > 0 && (
         <List<RowProps>
           listRef={listRef}
