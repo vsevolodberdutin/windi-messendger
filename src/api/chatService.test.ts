@@ -1,7 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getChats, getMessages, sendMessage } from './chatService';
 
-vi.mock('./mockData', () => ({
+jest.mock('./mockData', () => ({
   MOCK_CHATS: [
     {
       id: 'chat-1',
@@ -32,7 +31,7 @@ vi.mock('./mockData', () => ({
       unreadCount: 1
     }
   ],
-  getMockMessagesForChat: vi.fn(() => [
+  getMockMessagesForChat: jest.fn(() => [
     {
       id: 'msg-1',
       chatId: 'chat-1',
@@ -54,7 +53,7 @@ vi.mock('./mockData', () => ({
 
 describe('chatService', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('getChats', () => {

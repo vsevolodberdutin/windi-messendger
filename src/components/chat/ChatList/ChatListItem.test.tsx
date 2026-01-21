@@ -1,4 +1,3 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ChatListItem } from './ChatListItem';
 import type { Chat } from '../../../types';
@@ -89,7 +88,7 @@ describe('ChatListItem', () => {
   });
 
   it('should call onClick when clicked', () => {
-    const handleClick = vi.fn();
+    const handleClick = jest.fn();
 
     render(
       <ChatListItem chat={mockChat} isSelected={false} onClick={handleClick} />

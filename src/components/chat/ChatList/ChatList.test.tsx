@@ -1,22 +1,21 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ChatList } from './ChatList';
 import { useChatStore } from '../../../store/chatStore';
 
-vi.mock('../../../store/chatStore');
+jest.mock('../../../store/chatStore');
 
 describe('ChatList', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   it('should render loading spinner when isLoading is true', () => {
-    vi.mocked(useChatStore).mockReturnValue({
+    jest.mocked(useChatStore).mockReturnValue({
       chats: [],
       selectedChatId: null,
       isLoading: true,
       error: null,
-      selectChat: vi.fn()
+      selectChat: jest.fn()
     } as unknown as ReturnType<typeof useChatStore>);
 
     render(<ChatList />);
@@ -25,12 +24,12 @@ describe('ChatList', () => {
   });
 
   it('should render error message when there is an error', () => {
-    vi.mocked(useChatStore).mockReturnValue({
+    jest.mocked(useChatStore).mockReturnValue({
       chats: [],
       selectedChatId: null,
       isLoading: false,
       error: 'Failed to load chats',
-      selectChat: vi.fn()
+      selectChat: jest.fn()
     } as unknown as ReturnType<typeof useChatStore>);
 
     render(<ChatList />);
@@ -39,12 +38,12 @@ describe('ChatList', () => {
   });
 
   it('should render "No chats available" when chats array is empty', () => {
-    vi.mocked(useChatStore).mockReturnValue({
+    jest.mocked(useChatStore).mockReturnValue({
       chats: [],
       selectedChatId: null,
       isLoading: false,
       error: null,
-      selectChat: vi.fn()
+      selectChat: jest.fn()
     } as unknown as ReturnType<typeof useChatStore>);
 
     render(<ChatList />);
@@ -70,12 +69,12 @@ describe('ChatList', () => {
       }
     ];
 
-    vi.mocked(useChatStore).mockReturnValue({
+    jest.mocked(useChatStore).mockReturnValue({
       chats: mockChats,
       selectedChatId: null,
       isLoading: false,
       error: null,
-      selectChat: vi.fn()
+      selectChat: jest.fn()
     } as unknown as ReturnType<typeof useChatStore>);
 
     render(<ChatList />);
@@ -85,7 +84,7 @@ describe('ChatList', () => {
   });
 
   it('should call selectChat when a chat item is clicked', () => {
-    const mockSelectChat = vi.fn();
+    const mockSelectChat = jest.fn();
     const mockChats = [
       {
         id: 'chat-1',
@@ -96,7 +95,7 @@ describe('ChatList', () => {
       }
     ];
 
-    vi.mocked(useChatStore).mockReturnValue({
+    jest.mocked(useChatStore).mockReturnValue({
       chats: mockChats,
       selectedChatId: null,
       isLoading: false,
@@ -122,12 +121,12 @@ describe('ChatList', () => {
       }
     ];
 
-    vi.mocked(useChatStore).mockReturnValue({
+    jest.mocked(useChatStore).mockReturnValue({
       chats: mockChats,
       selectedChatId: 'chat-1',
       isLoading: false,
       error: null,
-      selectChat: vi.fn()
+      selectChat: jest.fn()
     } as unknown as ReturnType<typeof useChatStore>);
 
     render(<ChatList />);

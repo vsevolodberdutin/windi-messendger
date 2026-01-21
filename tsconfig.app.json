@@ -25,7 +25,7 @@
     "noImplicitReturns": true,
 
     /* Type definitions */
-    "types": ["vitest/globals", "node"]
+    "types": ["node"]
   },
   "include": ["src"]
 }

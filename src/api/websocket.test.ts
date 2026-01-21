@@ -1,7 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mockWebSocket } from './websocket';
 
-vi.mock('./mockData', () => ({
+jest.mock('./mockData', () => ({
   MOCK_USERS: [
     {
       id: 'user-1',
@@ -14,13 +13,13 @@ vi.mock('./mockData', () => ({
 
 describe('mockWebSocket', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    jest.useFakeTimers();
     mockWebSocket.disconnect();
   });
 
   afterEach(() => {
     mockWebSocket.disconnect();
-    vi.useRealTimers();
+    jest.useRealTimers();
   });
 
   describe('connect', () => {
@@ -58,7 +57,7 @@ describe('mockWebSocket', () => {
 
   describe('onMessage', () => {
     it('should add listener', () => {
-      const callback = vi.fn();
+      const callback = jest.fn();
 
       const unsubscribe = mockWebSocket.onMessage(callback);
 
@@ -66,7 +65,7 @@ describe('mockWebSocket', () => {
     });
 
     it('should return unsubscribe function', () => {
-      const callback = vi.fn();
+      const callback = jest.fn();
 
       const unsubscribe = mockWebSocket.onMessage(callback);
       unsubscribe();
@@ -75,25 +74,25 @@ describe('mockWebSocket', () => {
     });
 
     it('should receive messages when connected', async () => {
-      const callback = vi.fn();
+      const callback = jest.fn();
 
       mockWebSocket.onMessage(callback);
       mockWebSocket.connect();
 
-      await vi.advanceTimersByTimeAsync(10000);
+      await jest.advanceTimersByTimeAsync(10000);
 
       expect(callback).toHaveBeenCalled();
     });
 
     it('should not receive messages after unsubscribe', async () => {
-      const callback = vi.fn();
+      const callback = jest.fn();
 
       const unsubscribe = mockWebSocket.onMessage(callback);
       mockWebSocket.connect();
 
       unsubscribe();
 
-      await vi.advanceTimersByTimeAsync(10000);
+      await jest.advanceTimersByTimeAsync(10000);
 
       expect(callback).not.toHaveBeenCalled();
     });
@@ -113,12 +112,12 @@ describe('mockWebSocket', () => {
 
   describe('message format', () => {
     it('should send messages with correct structure', async () => {
-      const callback = vi.fn();
+      const callback = jest.fn();
 
       mockWebSocket.onMessage(callback);
       mockWebSocket.connect();
 
-      await vi.advanceTimersByTimeAsync(10000);
+      await jest.advanceTimersByTimeAsync(10000);
 
       expect(callback).toHaveBeenCalled();
       const message = callback.mock.calls[0][0];

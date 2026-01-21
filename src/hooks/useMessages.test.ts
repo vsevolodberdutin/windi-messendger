@@ -1,22 +1,21 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useMessages } from './useMessages';
 import { useMessageStore } from '../store/messageStore';
 import { useChatStore } from '../store/chatStore';
 
-vi.mock('../store/messageStore');
-vi.mock('../store/chatStore');
+jest.mock('../store/messageStore');
+jest.mock('../store/chatStore');
 
 describe('useMessages', () => {
-  const mockFetchMessages = vi.fn();
-  const mockSendMessage = vi.fn();
+  const mockFetchMessages = jest.fn();
+  const mockSendMessage = jest.fn();
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
 
-    vi.mocked(useChatStore).mockReturnValue('chat-1' as unknown as ReturnType<typeof useChatStore>);
+    jest.mocked(useChatStore).mockReturnValue('chat-1' as unknown as ReturnType<typeof useChatStore>);
 
-    vi.mocked(useMessageStore).mockReturnValue({
+    jest.mocked(useMessageStore).mockReturnValue({
       messages: {},
       isLoading: {},
       error: null,
@@ -38,7 +37,7 @@ describe('useMessages', () => {
   });
 
   it('should not fetch if messages already exist', () => {
-    vi.mocked(useMessageStore).mockReturnValue({
+    jest.mocked(useMessageStore).mockReturnValue({
       messages: { 'chat-1': [{ id: 'msg-1' }] },
       isLoading: {},
       error: null,
@@ -52,7 +51,7 @@ describe('useMessages', () => {
   });
 
   it('should not fetch if already loading', () => {
-    vi.mocked(useMessageStore).mockReturnValue({
+    jest.mocked(useMessageStore).mockReturnValue({
       messages: {},
       isLoading: { 'chat-1': true },
       error: null,
@@ -68,7 +67,7 @@ describe('useMessages', () => {
   it('should return messages for the chat', () => {
     const mockMessages = [{ id: 'msg-1', text: 'Hello' }];
 
-    vi.mocked(useMessageStore).mockReturnValue({
+    jest.mocked(useMessageStore).mockReturnValue({
       messages: { 'chat-1': mockMessages },
       isLoading: {},
       error: null,
@@ -82,7 +81,7 @@ describe('useMessages', () => {
   });
 
   it('should return empty array when no messages exist', () => {
-    vi.mocked(useMessageStore).mockReturnValue({
+    jest.mocked(useMessageStore).mockReturnValue({
       messages: {},
       isLoading: {},
       error: null,
@@ -96,7 +95,7 @@ describe('useMessages', () => {
   });
 
   it('should return loading state for the chat', () => {
-    vi.mocked(useMessageStore).mockReturnValue({
+    jest.mocked(useMessageStore).mockReturnValue({
       messages: {},
       isLoading: { 'chat-1': true },
       error: null,
@@ -118,7 +117,7 @@ describe('useMessages', () => {
   });
 
   it('should not send message if chatId is not available', () => {
-    vi.mocked(useChatStore).mockReturnValue(null as unknown as ReturnType<typeof useChatStore>);
+    jest.mocked(useChatStore).mockReturnValue(null as unknown as ReturnType<typeof useChatStore>);
 
     const { result } = renderHook(() => useMessages());
 

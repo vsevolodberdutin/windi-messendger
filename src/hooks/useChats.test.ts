@@ -1,18 +1,17 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useChats } from './useChats';
 import { useChatStore } from '../store/chatStore';
 
-vi.mock('../store/chatStore');
+jest.mock('../store/chatStore');
 
 describe('useChats', () => {
-  const mockFetchChats = vi.fn();
-  const mockSelectChat = vi.fn();
+  const mockFetchChats = jest.fn();
+  const mockSelectChat = jest.fn();
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
 
-    vi.mocked(useChatStore).mockReturnValue({
+    jest.mocked(useChatStore).mockReturnValue({
       chats: [],
       selectedChatId: null,
       isLoading: false,
@@ -34,7 +33,7 @@ describe('useChats', () => {
       { id: 'chat-1', name: 'Test', avatar: '', lastMessage: null, unreadCount: 0 }
     ];
 
-    vi.mocked(useChatStore).mockReturnValue({
+    jest.mocked(useChatStore).mockReturnValue({
       chats: mockChats,
       selectedChatId: 'chat-1',
       isLoading: false,
@@ -51,7 +50,7 @@ describe('useChats', () => {
   });
 
   it('should return null for selectedChat when no chat is selected', () => {
-    vi.mocked(useChatStore).mockReturnValue({
+    jest.mocked(useChatStore).mockReturnValue({
       chats: [{ id: 'chat-1', name: 'Test', avatar: '', lastMessage: null, unreadCount: 0 }],
       selectedChatId: null,
       isLoading: false,

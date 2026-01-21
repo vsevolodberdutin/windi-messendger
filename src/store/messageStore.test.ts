@@ -1,10 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useMessageStore } from './messageStore';
 import { useChatStore } from './chatStore';
 import type { Message } from '../types';
 
-vi.mock('../api/chatService', () => ({
-  getMessages: vi.fn((chatId: string) =>
+jest.mock('../api/chatService', () => ({
+  getMessages: jest.fn((chatId: string) =>
     Promise.resolve([
       {
         id: 'msg-1',
@@ -24,7 +23,7 @@ vi.mock('../api/chatService', () => ({
       }
     ])
   ),
-  sendMessage: vi.fn(() => Promise.resolve({ id: 'sent-msg-id' }))
+  sendMessage: jest.fn(() => Promise.resolve({ id: 'sent-msg-id' }))
 }));
 
 describe('messageStore', () => {
@@ -49,7 +48,7 @@ describe('messageStore', () => {
       isLoading: false,
       error: null
     });
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('fetchMessages', () => {
@@ -177,7 +176,7 @@ describe('messageStore', () => {
     });
 
     it('should update message status after sending', async () => {
-      vi.useFakeTimers();
+      jest.useFakeTimers();
       await useMessageStore.getState().fetchMessages('chat-1');
       const { sendMessage } = useMessageStore.getState();
 
@@ -187,14 +186,14 @@ describe('messageStore', () => {
       const lastMessage = messages[messages.length - 1];
       const messageId = lastMessage.id;
 
-      await vi.runAllTimersAsync();
+      await jest.runAllTimersAsync();
 
       const updatedMessages = useMessageStore.getState().messages['chat-1'];
       const updatedMessage = updatedMessages.find((m) => m.id === messageId);
 
       expect(updatedMessage?.status).toBe('read');
 
-      vi.useRealTimers();
+      jest.useRealTimers();
     });
   });
 

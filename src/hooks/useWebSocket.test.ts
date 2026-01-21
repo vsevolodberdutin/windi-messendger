@@ -1,36 +1,35 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useWebSocket } from './useWebSocket';
 import { mockWebSocket } from '../api/websocket';
 import { useMessageStore } from '../store/messageStore';
 
-vi.mock('../api/websocket', () => ({
+jest.mock('../api/websocket', () => ({
   mockWebSocket: {
     connected: false,
-    connect: vi.fn(),
-    disconnect: vi.fn(),
-    onMessage: vi.fn(() => vi.fn())
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+    onMessage: jest.fn(() => jest.fn())
   }
 }));
 
-vi.mock('../store/messageStore');
+jest.mock('../store/messageStore');
 
 describe('useWebSocket', () => {
-  const mockAddMessage = vi.fn();
+  const mockAddMessage = jest.fn();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let onMessageCallback: ((message: any) => void) | null = null;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
 
-    vi.mocked(useMessageStore).mockReturnValue({
+    jest.mocked(useMessageStore).mockReturnValue({
       addMessage: mockAddMessage
     } as unknown as ReturnType<typeof useMessageStore>);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    vi.mocked(mockWebSocket.onMessage).mockImplementation((callback: any) => {
+    jest.mocked(mockWebSocket.onMessage).mockImplementation((callback: any) => {
       onMessageCallback = callback;
-      return vi.fn();
+      return jest.fn();
     });
   });
 
@@ -91,8 +90,8 @@ describe('useWebSocket', () => {
   });
 
   it('should unsubscribe on unmount', () => {
-    const mockUnsubscribe = vi.fn();
-    vi.mocked(mockWebSocket.onMessage).mockReturnValue(mockUnsubscribe);
+    const mockUnsubscribe = jest.fn();
+    jest.mocked(mockWebSocket.onMessage).mockReturnValue(mockUnsubscribe);
 
     const { unmount } = renderHook(() => useWebSocket());
 

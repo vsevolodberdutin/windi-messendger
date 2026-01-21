@@ -1,9 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useChatStore } from './chatStore';
 import type { Message } from '../types';
 
-vi.mock('../api/chatService', () => ({
-  getChats: vi.fn(() =>
+jest.mock('../api/chatService', () => ({
+  getChats: jest.fn(() =>
     Promise.resolve([
       {
         id: 'chat-1',

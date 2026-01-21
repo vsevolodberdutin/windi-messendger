@@ -1,14 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { formatMessageTime, formatFullTime, truncateText } from './formatters';
 
 describe('formatters', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2024-03-15T12:00:00'));
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2024-03-15T12:00:00'));
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    jest.useRealTimers();
   });
 
   describe('formatMessageTime', () => {
