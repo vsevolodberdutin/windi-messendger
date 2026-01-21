@@ -2,6 +2,9 @@
 
 Chat interface prototype with virtualized message list (5000+ messages), mock API services, and real-time WebSocket simulation.
 
+**Live Demo:** [https://windi-messendger.vercel.app](https://windi-messendger.vercel.app)  
+You can see the working chat interface directly in your browser.
+
 ## Quick Start
 
 ```bash
