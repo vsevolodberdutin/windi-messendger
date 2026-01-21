@@ -31,11 +31,14 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   pendingTimeouts: {},
 
   fetchMessages: async (chatId: string) => {
-    const { loadedChats, isLoading } = get();
+    const { loadedChats, isLoading, messages } = get();
 
     if (loadedChats[chatId] || isLoading[chatId]) {
       return;
     }
+
+    // Save ALL existing messages (including WebSocket messages) before fetch
+    const existingMessages = messages[chatId] ?? [];
 
     set((state) => ({
       isLoading: { ...state.isLoading, [chatId]: true },
@@ -44,15 +47,44 @@ export const useMessageStore = create<MessageState>((set, get) => ({
 
     try {
       const fetchedMessages = await getMessages(chatId);
+
+      // Get any new messages that arrived during the fetch
+      const currentMessages = get().messages[chatId] ?? [];
+
+      // Create a map of all messages by ID to remove duplicates
+      const messageMap = new Map<string, Message>();
+
+      // Add fetched messages first (they are the source of truth for historical data)
+      fetchedMessages.forEach(msg => messageMap.set(msg.id, msg));
+
+      // Add existing messages (preserves WebSocket messages that aren't in fetched data)
+      existingMessages.forEach(msg => {
+        if (!messageMap.has(msg.id)) {
+          messageMap.set(msg.id, msg);
+        }
+      });
+
+      // Add messages that arrived during fetch
+      currentMessages.forEach(msg => {
+        if (!messageMap.has(msg.id)) {
+          messageMap.set(msg.id, msg);
+        }
+      });
+
+      // Convert back to array and sort by timestamp
+      const allMessages = Array.from(messageMap.values()).sort(
+        (a, b) => a.timestamp - b.timestamp
+      );
+
       set((state) => ({
-        messages: { ...state.messages, [chatId]: fetchedMessages },
+        messages: { ...state.messages, [chatId]: allMessages },
         isLoading: { ...state.isLoading, [chatId]: false },
         loadedChats: { ...state.loadedChats, [chatId]: true }
       }));
 
       // Update chat's last message with the actual last message from MessageList
-      if (fetchedMessages.length > 0) {
-        const actualLastMessage = fetchedMessages[fetchedMessages.length - 1];
+      if (allMessages.length > 0) {
+        const actualLastMessage = allMessages[allMessages.length - 1];
         const chatStore = useChatStore.getState();
         chatStore.updateLastMessage(chatId, actualLastMessage);
       }
@@ -132,12 +164,21 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       const chatMessages = state.messages[chatId];
       if (!chatMessages) return state;
 
+      const updatedMessages = chatMessages.map((msg) =>
+        msg.id === messageId ? { ...msg, status } : msg
+      );
+
+      // Update chat's lastMessage if the updated message is the last one
+      const lastMessage = updatedMessages[updatedMessages.length - 1];
+      if (lastMessage && lastMessage.id === messageId) {
+        const chatStore = useChatStore.getState();
+        chatStore.updateLastMessage(chatId, lastMessage);
+      }
+
       return {
         messages: {
           ...state.messages,
-          [chatId]: chatMessages.map((msg) =>
-            msg.id === messageId ? { ...msg, status } : msg
-          )
+          [chatId]: updatedMessages
         }
       };
     });
