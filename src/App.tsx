@@ -3,7 +3,7 @@ import { useChatStore, useUIStore } from "./store";
 import { useWebSocket } from "./hooks";
 import { ChatList, MessageList, MessageInput } from "./components/chat";
 import { Avatar } from "./components/ui";
-import bgImage from "./assets/bg.png";
+import bgImage from "./assets/bg.webp";
 
 function App() {
   const fetchChats = useChatStore((state) => state.fetchChats);
