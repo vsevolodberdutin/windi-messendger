@@ -1,12 +1,12 @@
 // Mock logger for tests
-export const createLogger = (prefix: string) => ({
+export const createLogger = () => ({
   debug: jest.fn(),
   info: jest.fn(),
   warn: jest.fn(),
   error: jest.fn()
 });
 
-export const measurePerformance = jest.fn((label: string, fn: () => unknown) => {
+export const measurePerformance = jest.fn(( fn: () => unknown) => {
   return fn();
 });
 
