@@ -22,39 +22,10 @@ describe('useChats', () => {
     } as unknown as ReturnType<typeof useChatStore>);
   });
 
-  it('should fetch chats on mount when chats are empty', () => {
+  it('should not automatically fetch chats on mount', () => {
     renderHook(() => useChats());
 
-    expect(mockFetchChats).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not fetch chats if already loading', () => {
-    vi.mocked(useChatStore).mockReturnValue({
-      chats: [],
-      selectedChatId: null,
-      isLoading: true,
-      error: null,
-      fetchChats: mockFetchChats,
-      selectChat: mockSelectChat
-    } as unknown as ReturnType<typeof useChatStore>);
-
-    renderHook(() => useChats());
-
-    expect(mockFetchChats).not.toHaveBeenCalled();
-  });
-
-  it('should not fetch chats if chats already exist', () => {
-    vi.mocked(useChatStore).mockReturnValue({
-      chats: [{ id: 'chat-1', name: 'Test', avatar: '', lastMessage: null, unreadCount: 0 }],
-      selectedChatId: null,
-      isLoading: false,
-      error: null,
-      fetchChats: mockFetchChats,
-      selectChat: mockSelectChat
-    } as unknown as ReturnType<typeof useChatStore>);
-
-    renderHook(() => useChats());
-
+    // Hook no longer fetches automatically - fetching is handled in App.tsx
     expect(mockFetchChats).not.toHaveBeenCalled();
   });
 

@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import type { Message } from '../types';
 import { MOCK_USERS } from './mockData';
+import { logError } from '../utils/logger';
 
 type MessageCallback = (message: Message) => void;
 
@@ -83,7 +84,7 @@ class MockWebSocket {
       try {
         callback(message);
       } catch (error) {
-        console.error('Error in message listener:', error);
+        logError('Error in message listener', error, { component: 'WebSocket' });
       }
     });
   }

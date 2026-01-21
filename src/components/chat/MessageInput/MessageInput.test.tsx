@@ -9,13 +9,13 @@ vi.mock("../../../store/chatStore");
 vi.mock("../../../store/messageStore");
 
 describe("MessageInput", () => {
-  const mockSendMessage = vi.fn();
+  const mockОтправитьMessage = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     vi.mocked(useMessageStore).mockReturnValue({
-      sendMessage: mockSendMessage,
+      sendMessage: mockОтправитьMessage,
     } as ReturnType<typeof useMessageStore>);
   });
 
@@ -80,7 +80,7 @@ describe("MessageInput", () => {
     const sendButton = screen.getByRole("button", { name: "Отправить" });
     fireEvent.click(sendButton);
 
-    expect(mockSendMessage).toHaveBeenCalledWith("chat-1", "Hello");
+    expect(mockОтправитьMessage).toHaveBeenCalledWith("chat-1", "Hello");
   });
 
   it("should clear input after sending message", async () => {
@@ -109,7 +109,7 @@ describe("MessageInput", () => {
     const input = screen.getByLabelText("Message input");
     await userEvent.type(input, "Hello{Enter}");
 
-    expect(mockSendMessage).toHaveBeenCalledWith("chat-1", "Hello");
+    expect(mockОтправитьMessage).toHaveBeenCalledWith("chat-1", "Hello");
   });
 
   it("should not send empty or whitespace-only messages", async () => {
@@ -122,7 +122,7 @@ describe("MessageInput", () => {
     const input = screen.getByLabelText("Message input");
     await userEvent.type(input, "   {Enter}");
 
-    expect(mockSendMessage).not.toHaveBeenCalled();
+    expect(mockОтправитьMessage).not.toHaveBeenCalled();
   });
 
   it("should trim message text before sending", async () => {
@@ -138,6 +138,6 @@ describe("MessageInput", () => {
     const sendButton = screen.getByRole("button", { name: "Отправить" });
     fireEvent.click(sendButton);
 
-    expect(mockSendMessage).toHaveBeenCalledWith("chat-1", "Hello World");
+    expect(mockОтправитьMessage).toHaveBeenCalledWith("chat-1", "Hello World");
   });
 });

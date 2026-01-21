@@ -5,6 +5,7 @@ import { getMessages, sendMessage as apiSendMessage } from '../api/chatService';
 import { CURRENT_USER } from '../types/user';
 import { useChatStore } from './chatStore';
 import { MESSAGE_STATUS_DELAYS } from '../constants';
+import { logError } from '../utils/logger';
 
 interface MessageState {
   messages: Record<string, Message[]>;
@@ -119,7 +120,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
         }));
       })
       .catch((error) => {
-        console.error('Failed to send message:', error);
+        logError('Failed to send message', error, { chatId, component: 'MessageStore' });
         get().updateMessageStatus(chatId, optimisticId, 'failed');
         // Clean up timeouts on failure
         get().clearPendingTimeouts(optimisticId);
