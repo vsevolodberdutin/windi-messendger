@@ -1,12 +1,11 @@
 import { useEffect, useRef, useCallback, useState, type CSSProperties } from 'react';
 import { List, type ListImperativeAPI } from 'react-window';
 import { useMessageStore, useChatStore } from '../../../store';
+import { useResizeObserver } from '../../../hooks';
+import { UI_CONSTANTS } from '../../../constants';
 import { Spinner, Button } from '../../ui';
 import { MessageItem } from './MessageItem';
 import type { Message } from '../../../types';
-
-const ITEM_HEIGHT = 72;
-const SCROLL_THRESHOLD = 200;
 
 interface RowProps {
   messages: Message[];
@@ -30,33 +29,11 @@ export function MessageList() {
   const { messages, isLoading, error, fetchMessages } = useMessageStore();
   const listRef = useRef<ListImperativeAPI>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const { dimensions, callbackRef: containerCallbackRef } = useResizeObserver();
   const lastScrollTop = useRef(0);
-  const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   const chatMessages = selectedChatId ? messages[selectedChatId] ?? [] : [];
   const isChatLoading = selectedChatId ? isLoading[selectedChatId] : false;
-
-  const containerCallbackRef = useCallback((node: HTMLDivElement | null) => {
-    if (resizeObserverRef.current) {
-      resizeObserverRef.current.disconnect();
-      resizeObserverRef.current = null;
-    }
-
-    if (node) {
-      resizeObserverRef.current = new ResizeObserver((entries) => {
-        const entry = entries[0];
-        if (entry) {
-          setDimensions({
-            width: entry.contentRect.width,
-            height: entry.contentRect.height
-          });
-        }
-      });
-
-      resizeObserverRef.current.observe(node);
-    }
-  }, []);
 
   useEffect(() => {
     if (selectedChatId) {
@@ -81,11 +58,11 @@ export function MessageList() {
     (event: React.UIEvent<HTMLDivElement>) => {
       const target = event.currentTarget;
       const scrollTop = target.scrollTop;
-      const maxScroll = chatMessages.length * ITEM_HEIGHT - dimensions.height;
+      const maxScroll = chatMessages.length * UI_CONSTANTS.MESSAGE_ITEM_HEIGHT - dimensions.height;
       const distanceFromBottom = maxScroll - scrollTop;
 
       lastScrollTop.current = scrollTop;
-      setShowScrollButton(distanceFromBottom > SCROLL_THRESHOLD);
+      setShowScrollButton(distanceFromBottom > UI_CONSTANTS.SCROLL_THRESHOLD);
     },
     [chatMessages.length, dimensions.height]
   );
@@ -150,8 +127,8 @@ export function MessageList() {
         <List<RowProps>
           listRef={listRef}
           rowCount={chatMessages.length}
-          rowHeight={ITEM_HEIGHT}
-          overscanCount={10}
+          rowHeight={UI_CONSTANTS.MESSAGE_ITEM_HEIGHT}
+          overscanCount={UI_CONSTANTS.MESSAGE_LIST_OVERSCAN_COUNT}
           defaultHeight={dimensions.height}
           onScroll={handleScroll}
           style={{ height: dimensions.height, width: dimensions.width }}

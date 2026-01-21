@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useChatStore, useUIStore } from "./store";
 import { useWebSocket } from "./hooks";
 import { ChatList, MessageList, MessageInput } from "./components/chat";
+import { Avatar } from "./components/ui";
 import bgImage from "./assets/bg.png";
 
 function App() {
@@ -28,21 +29,16 @@ function App() {
     <div className="flex h-screen bg-white">
       {/* Sidebar - Chat List */}
       <aside
-        className={`shrink-0 flex flex-col
+        className={`shrink-0 flex flex-col ${isSidebarOpen ? "w-80" : "w-16"}
           border-r border-gray-200
           shadow-[8px_0_16px_-4px_rgba(0,0,0,0.1)]
-          transition-all duration-300 ease-in-out
-          ${isSidebarOpen ? "w-80" : "w-16"}`}>
+          transition-all duration-300 ease-in-out`}>
         <header
-          className={`flex items-center justify-between h-16 
-            border-b border-gray-200
-            ${isSidebarOpen ? "pl-4 pr-1" : "px-4"}`}>
+          className={`flex items-center justify-between h-16 ${isSidebarOpen ? "pl-4 pr-1" : "px-4"}
+            border-b border-gray-200`}>
           <h1
-            className={`text-xl font-bold text-gray-900
-            transition-opacity duration-200
-            ${
-              isSidebarOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
-            }`}>
+            className={`text-xl font-bold text-gray-900 ${isSidebarOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"}
+            transition-opacity duration-200`}>
             Windi Messenger
           </h1>
           <button
@@ -85,14 +81,14 @@ function App() {
         <header
           className="flex items-center h-16 px-4
             border-b border-gray-200 bg-white
-            shadow-[0_8px_16px_-4px_rgba(0,0,0,0.1)]"
-        >
+            shadow-[0_8px_16px_-4px_rgba(0,0,0,0.1)]">
+
           {selectedChat ? (
             <div className="flex items-center gap-3">
-              <img
+              <Avatar
                 src={selectedChat.avatar}
                 alt={selectedChat.name}
-                className="w-10 h-10 rounded-full"
+                size="md"
               />
               <span className="font-medium text-gray-900">
                 {selectedChat.name}

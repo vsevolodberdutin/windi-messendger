@@ -24,6 +24,8 @@ export const UI_CONSTANTS = {
   MESSAGE_ITEM_HEIGHT: 72,
   /** Scroll threshold for showing "new messages" button */
   SCROLL_THRESHOLD: 200,
+  /** Number of items to render outside the visible viewport (virtualization optimization) */
+  MESSAGE_LIST_OVERSCAN_COUNT: 10,
   /** Sidebar width when expanded (Tailwind w-80 = 20rem = 320px) */
   SIDEBAR_WIDTH_EXPANDED: 320,
   /** Sidebar width when collapsed (Tailwind w-16 = 4rem = 64px) */

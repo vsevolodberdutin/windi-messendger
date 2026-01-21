@@ -38,27 +38,21 @@ export function MessageItem({ message, style }: MessageItemProps) {
   return (
     <div
       style={style}
-      className={`flex px-4 py-1
-        ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+      className={`flex px-4 py-1 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
     >
       <div
         className={`max-w-[70%] px-3 py-2
-          rounded-2xl
-          shadow-xl 
-          ${isCurrentUser
-            ? 'bg-blue-500 text-white rounded-br-sm shadow-gray-600/40'
-            : 'bg-white text-gray-900 rounded-bl-sm shadow-gray-600/30'}`}
+          ${isCurrentUser ? 'bg-blue-500 text-white rounded-2xl rounded-br-sm' : 'bg-white text-gray-900 rounded-2xl rounded-bl-sm'}
+          ${isCurrentUser ? 'shadow-xl shadow-gray-600/40' : 'shadow-xl shadow-gray-600/30'}`}
       >
         <p className="whitespace-pre-wrap wrap-break-word text-sm">
           {message.text}
         </p>
         <div
-          className={`flex items-center gap-1 mt-1
-            ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+          className={`flex items-center gap-1 mt-1 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
         >
           <span
-            className={`text-xs
-              ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'}`}
+            className={`text-xs ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'}`}
           >
             {formatMessageTime(message.timestamp)}
           </span>
